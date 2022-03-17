@@ -14,6 +14,7 @@ on:
       - 'release'
       - 'release/*'
       - 'release-*'
+      - 'leapide-*'
   check_run:
     types: [rerequested, requested_action]
   push:
@@ -22,8 +23,7 @@ on:
       - 'release'
       - 'release/*'
       - 'release-*'
-  schedule:
-    - cron: "0 9 * * 1-5" # 9am UTC, Monday-Friday (2am PDT, after VS Code Insider builds which is 11pm PDT)
+      - 'leapide-*'
   workflow_dispatch:
 env:
   NODE_VERSION: 12.14.1
@@ -52,7 +52,7 @@ jobs:
       vsix_name: ${{ env.vsix_name }}
       test_matrix_os: ${{ env.test_matrix_os }}
       release_channel: ${{ env.release_channel }}
-    if: github.repository == 'microsoft/vscode-jupyter'
+    #if: github.repository == 'microsoft/vscode-jupyter'
     steps:
       - name: dump_event
         run: |
@@ -73,11 +73,11 @@ jobs:
           echo "vsix_name=ms-toolsai-jupyter-insiders.vsix" >> $GITHUB_ENV
           echo "test_matrix_os=[\"ubuntu-latest\", \"windows-latest\"]" >> $GITHUB_ENV
 
-      - name: insiders channel
-        # Scheduled builds will publish Insider builds.
-        if: github.event_name == 'schedule' && github.ref == 'refs/heads/main'
+      - name: leapide insiders
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/leapide-')
         run: |
-          echo "release_channel=insider" >> $GITHUB_ENV
+          echo "vsix_name=ms-toolsai-jupyter-insiders.vsix" >> $GITHUB_ENV
+          echo "test_matrix_os=[\"ubuntu-latest\"]" >> $GITHUB_ENV
 
       - name: release
         if: github.event_name == 'push' && contains(github.ref, 'refs/heads/release')
@@ -260,7 +260,7 @@ jobs:
     needs: pick_environment
     name: Type Script Tests
     runs-on: ${{ matrix.os }}
-    if: github.repository == 'microsoft/vscode-jupyter'
+    #if: github.repository == 'microsoft/vscode-jupyter'
     strategy:
       fail-fast: false
       matrix:
