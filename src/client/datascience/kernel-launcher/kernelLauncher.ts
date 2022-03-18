@@ -9,7 +9,7 @@ import * as path from 'path';
 import * as portfinder from 'portfinder';
 import { promisify } from 'util';
 import * as uuid from 'uuid/v4';
-import { CancellationToken } from 'vscode';
+import { CancellationToken, workspace } from 'vscode';
 import { IPythonExtensionChecker } from '../../api/types';
 import { isTestExecution } from '../../common/constants';
 import { traceInfo } from '../../common/logger';
@@ -26,6 +26,8 @@ import { IKernelConnection, IKernelLauncher, IKernelProcess } from './types';
 import { CancellationError } from '../../common/cancellation';
 import { sendKernelTelemetryWhenDone } from '../telemetry/telemetry';
 import { sendTelemetryEvent } from '../../telemetry';
+
+const configuration = workspace.getConfiguration();
 
 const PortFormatString = `kernelLauncherPortStart_{0}.tmp`;
 // Launches and returns a kernel process given a resource or python interpreter.
@@ -66,9 +68,10 @@ export class KernelLauncher implements IKernelLauncher {
     }
 
     private static async computeStartPort(): Promise<number> {
+        let kernelPortsBase = configuration.get<number>('jupyter.kernelPortsBase', 29_000);
         if (isTestExecution()) {
             // Since multiple instances of a test may be running, write our best guess to a shared file
-            let portStart = 29_000;
+            let portStart = kernelPortsBase;
             let result = 0;
             while (result === 0 && portStart < 65_000) {
                 try {
@@ -87,7 +90,7 @@ export class KernelLauncher implements IKernelLauncher {
 
             return result;
         } else {
-            return 29_000;
+            return kernelPortsBase;
         }
     }
 

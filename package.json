@@ -1582,6 +1582,14 @@
                     "description": "Amount of time (in ms) to wait for the Jupyter Notebook server to start.",
                     "scope": "resource"
                 },
+                "jupyter.kernelPortsBase": {
+                    "type": "number",
+                    "default": 29000,
+                    "minimum": 1024,
+                    "maximum": 65000,
+                    "description": "Lowest port number used for communication with Jupyter kernel.",
+                    "scope": "resource"
+                },
                 "jupyter.jupyterLaunchRetries": {
                     "type": "number",
                     "default": 3,
