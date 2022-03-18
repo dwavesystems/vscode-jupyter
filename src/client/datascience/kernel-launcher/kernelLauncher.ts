@@ -68,7 +68,7 @@ export class KernelLauncher implements IKernelLauncher {
     private static async computeStartPort(): Promise<number> {
         if (isTestExecution()) {
             // Since multiple instances of a test may be running, write our best guess to a shared file
-            let portStart = 9_000;
+            let portStart = 29_000;
             let result = 0;
             while (result === 0 && portStart < 65_000) {
                 try {
@@ -87,7 +87,7 @@ export class KernelLauncher implements IKernelLauncher {
 
             return result;
         } else {
-            return 9_000;
+            return 29_000;
         }
     }
 
